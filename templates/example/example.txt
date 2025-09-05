@@ -1,0 +1,4 @@
+Dear {{ name }},
+This is an email to inform you that your book {{ book }} is {{ status }}.
+Regards,
+Fictional Fiction Library
