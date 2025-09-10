@@ -1,7 +1,6 @@
 from pathlib import Path
 from loguru import logger
 import pandas as pd
-import smtplib
 
 def extract_data(file_name: str, columns: list = []) -> pd.DataFrame:
     '''
@@ -77,23 +76,8 @@ def load_templates(template_name: str) -> tuple[str, str]:
     
     return (txt_template, html_template)
 
-
-    
-def login(server: smtplib.SMTPL_SSL, receiver_email: str = ''):
+def find_email_col():
     '''
-    Handle login either by secret files or by user input.
+    Finds column of datawhere emails are located
     '''
-    password_path = Path('secrets') / 'passwd'
-    sender_email_path = Path('secrets') / 'sender'
-
-    if sender_email_path.exists():
-        sender_email = sender_email_path.read_text()
-    else:
-        sender_email = input("Enter email to send from: ")
-
-    if password_path.exists():
-        password = password_path.read_text()
-    else:
-        password = input("Enter password: ")
-    
-    server.login(sender_email, password)
+    pass
