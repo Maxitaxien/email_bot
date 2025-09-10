@@ -1,7 +1,6 @@
 from pathlib import Path
 from loguru import logger
 import pandas as pd
-import smtplib
 
 def extract_data(file_name: str, columns: list = []) -> pd.DataFrame:
     '''
@@ -77,23 +76,24 @@ def load_templates(template_name: str) -> tuple[str, str]:
     
     return (txt_template, html_template)
 
-
-    
-def login(server: smtplib.SMTPL_SSL, receiver_email: str = ''):
+def find_email_col(data: pd.DataFrame) -> tuple[pd.Series, str] :
     '''
-    Handle login either by secret files or by user input.
+    Finds column of data where emails are located
+    Extracts this column
+    :return: A tuple object consisting of the column and its name
     '''
-    password_path = Path('secrets') / 'passwd'
-    sender_email_path = Path('secrets') / 'sender'
+    # Simple test: Checks for common column names
+    candidates = ["mail", "email", "email_address", "contact_email", "user_email"]
+    for cand in candidates:
+        if cand in data.columns:
+            logger.info(f"Using column {cand} as email column. Rename correct column to 'mail' if this is incorrect")
+            return (data[cand], cand) 
 
-    if sender_email_path.exists():
-        sender_email = sender_email_path.read_text()
-    else:
-        sender_email = input("Enter email to send from: ")
-
-    if password_path.exists():
-        password = password_path.read_text()
-    else:
-        password = input("Enter password: ")
+    # None found -> search for @
+    for col in data:
+        if data[col].str.contains("@"):
+            logger.info(f"Using column {col} as email column. Rename correct column to 'mail' if this is incorrect")
+            return (data[col], col)
     
-    server.login(sender_email, password)
+    logger.error("No email column found.")
+    return (pd.Series, "")
